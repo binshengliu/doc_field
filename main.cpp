@@ -1,6 +1,6 @@
-
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 #include "indri/Repository.hpp"
 #include "indri/CompressedCollection.hpp"
@@ -10,6 +10,26 @@ using std::cerr;
 using std::endl;
 using std::vector;
 using std::string;
+
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}
 
 int main(int argc, char **argv)
 {
@@ -40,6 +60,7 @@ int main(int argc, char **argv)
 	}
 
 	string field_value = collection->retrieveMetadatum(ids[0], field);
+	trim(field_value);
 
 	cout << field_value << endl;
 
