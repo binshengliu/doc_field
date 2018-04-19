@@ -59,11 +59,21 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	string field_value = collection->retrieveMetadatum(ids[0], field);
-	trim(field_value);
+	string value = collection->retrieveMetadatum(ids[0], field);
 
-	cout << field_value << endl;
+	// Left and right whitespace
+	trim(value);
 
+	// remove apostrophes
+	value.erase(std::remove_if(value.begin(), value.end(),
+				   [](char c) { return c == '\'' || c == '\"';}),
+		    value.end());
+
+	// remove line break and non alnum
+	std::replace_if(value.begin(), value.end(),
+			[](char c) { return c == '\n' || !isalnum(c); }, ' ');
+
+	cout << value;
 	repo.close();
 
 	return EXIT_SUCCESS;
