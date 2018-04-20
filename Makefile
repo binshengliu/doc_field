@@ -1,7 +1,7 @@
 
 TARGET = dump_field
 
-INDRI_PATH=/research/remote/petabyte/users/indri-indexes/indri-5.11-bin/
+INDRI_PATH=/home/sl8/S3676608/.local
 
 CXX = g++
 CXXFLAGS = --std=c++11 -g -I$(INDRI_PATH)/include \
