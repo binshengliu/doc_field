@@ -38,6 +38,8 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
+	cerr << "Built with " << INDRI_DISTRIBUTION << endl;
+
 	string repository_name = argv[1];
 	string docno = argv[2];
 	string field = argv[3];
