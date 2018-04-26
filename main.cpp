@@ -59,7 +59,14 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	string value = collection->retrieveMetadatum(ids[0], field);
+	string value;
+	try {
+		value = collection->retrieveMetadatum(ids[0], field);
+	} catch (lemur::api::Exception& e) {
+		repo.close();
+		cerr << e.what() << endl;
+		return 1;
+	}
 
 	// Left and right whitespace
 	trim(value);
