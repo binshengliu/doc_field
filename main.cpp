@@ -34,15 +34,15 @@ static inline void trim(std::string &s) {
 int main(int argc, char **argv)
 {
 	if (argc != 4) {
-		cerr << "Usage: " << argv[0] << " <repo> <docno> <field>" << endl;
+		cerr << "Usage: " << argv[0] << " <repo> <field> <docno>" << endl;
 		return EXIT_FAILURE;
 	}
 
 	cerr << "Built with " << INDRI_DISTRIBUTION << endl;
 
 	string repository_name = argv[1];
-	string docno = argv[2];
-	string field = argv[3];
+	string field = argv[2];
+	string docno = argv[3];
 
 	if (!indri::collection::Repository::exists(repository_name)) {
 		cerr << "Repository " << repository_name << " doesn't exist." << endl;
@@ -53,22 +53,38 @@ int main(int argc, char **argv)
 	repo.openRead(repository_name);
 
 	indri::collection::CompressedCollection *collection = repo.collection();
-
 	vector<lemur::api::DOCID_T> ids = collection->retrieveIDByMetadatum("docno", docno);
 	if (ids.empty()) {
 		repo.close();
 		cerr << "Document " << docno << " not found." << endl;
 		return EXIT_FAILURE;
+	} else if (ids.size() > 1) {
+		cerr << "Warning: Retrieved " << ids.size() << " ids for " << docno << "." << endl;
 	}
 
-	string value;
-	try {
-		value = collection->retrieveMetadatum(ids[0], field);
-	} catch (lemur::api::Exception& e) {
+	auto id = ids[0];
+	indri::collection::Repository::index_state state = repo.indexes();
+	indri::index::Index *index = state->at(0);
+	indri::index::DocExtentListIterator *iter = index->fieldListIterator(field);
+	iter->startIteration();
+
+	bool result = iter->nextEntry(id);
+	if (!result) {
 		repo.close();
-		cerr << e.what() << endl;
-		return 1;
+		cerr << "Can't find " << field << " for " << docno << "." << endl;
+		return EXIT_FAILURE;
 	}
+
+	indri::index::DocExtentListIterator::DocumentExtentData *data = iter->currentEntry();
+	const indri::index::TermList *list = index->termList(data->document);;
+	auto terms = list->terms();
+	string value;
+	for (auto& extent : data->extents) {
+		for (size_t i = extent.begin; i < extent.end; i++) {
+			value += index->term(terms[i]) + " ";
+		}
+	}
+	repo.close();
 
 	// Left and right whitespace
 	trim(value);
@@ -83,7 +99,6 @@ int main(int argc, char **argv)
 			[](char c) { return c == '\n' || !isalnum(c); }, ' ');
 
 	cout << value;
-	repo.close();
 
 	return EXIT_SUCCESS;
 }
