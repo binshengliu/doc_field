@@ -1,5 +1,5 @@
 
-TARGET = dump_field
+TARGET = doc_field
 
 INDRI_PATH=/home/sl8/S3676608/.local
 
@@ -8,7 +8,7 @@ CXXFLAGS = --std=c++11 -g -I$(INDRI_PATH)/include \
 	-DHAVE_EXT_ATOMICITY=1 -DP_NEEDS_GNU_CXX_NAMESPACE=1
 LDFLAGS = -L$(INDRI_PATH)/lib -lindri -lz -pthread
 
-SRC = main.cpp
+SRC = doc_field.cpp
 OBJS = $(SRC:.cpp=.o)
 
 .PHONY: all
