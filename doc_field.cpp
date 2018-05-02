@@ -12,33 +12,34 @@ using std::vector;
 using std::string;
 
 // trim from start (in place)
-static inline void ltrim(std::string &s) {
+static inline void ltrim(string &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
         return !std::isspace(ch);
     }));
 }
 
 // trim from end (in place)
-static inline void rtrim(std::string &s) {
+static inline void rtrim(string &s) {
     s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
         return !std::isspace(ch);
     }).base(), s.end());
 }
 
 // trim from both ends (in place)
-static inline void trim(std::string &s) {
+static inline void trim(string &s) {
     ltrim(s);
     rtrim(s);
 }
 
 int main(int argc, char **argv)
 {
+	cerr << "Built with " << INDRI_DISTRIBUTION << endl;
+
 	if (argc != 4) {
-		cerr << "Usage: " << argv[0] << " <repo> <field> <docno>" << endl;
+		cerr << "Usage:   " << argv[0] << " <repo> <field> <docno>" << endl;
+		cerr << "Example: " << argv[0] << " cw09b-index/ inlink clueweb09-en0000-00-00000" << endl;
 		return EXIT_FAILURE;
 	}
-
-	cerr << "Built with " << INDRI_DISTRIBUTION << endl;
 
 	string repository_name = argv[1];
 	string field = argv[2];
